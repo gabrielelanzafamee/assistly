@@ -1,0 +1,18 @@
+<div class="form-contrainer w-full h-full flex justify-center items-center">
+  <form (ngSubmit)="onSubmit($event)" [formGroup]="knowledgeForm" class="form one-column w-full">
+
+    <div class="flex flex-row space-x-2">
+      <div class="w-12/12 w-full">
+        <app-shared-input [control]="this.getControl('name')" class="block" formControlName="name" id="name" type="text" label="Name"></app-shared-input>
+      </div>
+    </div>
+
+    <div class="flex flex-row space-x-2">
+      <div class="w-12/12 w-full">
+        <app-shared-file [control]="this.getControl('files')" class="block mt-2" formControlName="files" id="files" />
+      </div>
+    </div>
+
+    <app-shared-button class="mt-5 block" type="submit" label="Confirm" [disabled]="!knowledgeForm.valid" />
+  </form>
+</div>

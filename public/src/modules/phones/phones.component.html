@@ -1,0 +1,12 @@
+<app-shared-button (click)="this.openCreateModal($event)" label="Create"></app-shared-button>
+
+<app-modal #createPhoneModal>
+  <div modal-title>Create a new Phone Number</div>
+</app-modal>
+
+<div class="table-wrapper mt-5">
+  <app-shared-table
+  [columns]="columns"
+  [dataSource]="data"
+  ></app-shared-table>
+</div>

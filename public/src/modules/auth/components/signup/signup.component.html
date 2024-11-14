@@ -1,0 +1,70 @@
+<div class="form-contrainer w-full h-full flex justify-center items-center">
+  <form (ngSubmit)="onSubmit($event)" [formGroup]="signupForm" class="form one-column w-[512px] border rounded p-8">
+    <h2 class="!mb-5 !text-lg text-black !font-bold">Sign Up</h2>
+
+    <p class="!mt-5">User</p>
+
+    <div class="user-auth-data">
+      <div class="flex flex-row space-x-2">
+        <div class="w-6/12">
+          <app-shared-input [control]="this.getControl('userFirstName')" formControlName="userFirstName" id="userFirstName" type="text" label="First Name"></app-shared-input>
+        </div>
+        <div class="w-6/12">
+          <app-shared-input [control]="this.getControl('userLastName')" formControlName="userLastName" id="userLastName" type="text" label="Last Name"></app-shared-input>
+        </div>
+      </div>
+
+      <div class="flex flex-row space-x-2 mt-2">
+        <div class="w-6/12">
+          <app-shared-input [control]="this.getControl('userEmail')" formControlName="userEmail" id="userEmail" type="email" label="Email"></app-shared-input>
+        </div>
+        <div class="w-6/12">
+          <app-shared-input [control]="this.getControl('userPassword')" formControlName="userPassword" id="userPassword" type="password" label="Password"></app-shared-input>
+        </div>
+      </div>
+    </div>
+
+    <p class="!mt-5">Organization</p>
+
+    <div class="user-auth-data">
+      <div class="flex flex-row space-x-2">
+        <div class="w-6/12">
+          <app-shared-input [control]="this.getControl('name')" formControlName="name" id="name" type="text" label="Company"></app-shared-input>
+        </div>
+        <div class="w-6/12">
+          <app-shared-input [control]="this.getControl('type')" formControlName="type" id="type" type="text" label="Type"></app-shared-input>
+        </div>
+      </div>
+
+      <div class="flex flex-row space-x-2 mt-2">
+        <div class="w-6/12">
+          <app-shared-input [control]="this.getControl('zipcode')" formControlName="zipcode" id="zipcode" type="text" label="Zip Code"></app-shared-input>
+        </div>
+        <div class="w-6/12">
+          <app-shared-input [control]="this.getControl('address')" formControlName="address" id="address" type="text" label="Address"></app-shared-input>
+        </div>
+      </div>
+
+      <div class="flex flex-row space-x-2 mt-2">
+        <div class="w-6/12">
+          <app-shared-select [control]="this.getControl('country')" formControlName="country" id="country" [options]="countries"></app-shared-select>
+         </div>
+        <div class="w-6/12">
+          <app-shared-input [control]="this.getControl('city')" formControlName="city" id="city" type="text" label="City"></app-shared-input>
+        </div>
+      </div>
+
+      <div class="flex flex-row space-x-2 mt-2">
+        <div class="w-6/12">
+          <app-shared-input [control]="this.getControl('phoneNumber')" formControlName="phoneNumber" id="phoneNumber" type="text" label="Phone"></app-shared-input>
+        </div>
+        <div class="w-6/12">
+          <app-shared-input [control]="this.getControl('email')" formControlName="email" id="email" type="text" label="Email"></app-shared-input>
+        </div>
+      </div>
+    </div>
+
+    <app-shared-button class="mt-5 block" type="submit" label="Confirm" [disabled]="!signupForm.valid" />
+    <p class="!mt-5 !mb-0">Do you have an account? <a href="/login" class="text-sky-400">Login now</a></p>
+  </form>
+</div>

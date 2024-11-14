@@ -1,0 +1,14 @@
+<div class="form-contrainer w-full h-full">
+  <div class="messages-container w-full max-h-[728px] overflow-scroll">
+    <div *ngFor="let item of transcription" class="message-item flex flex-col mb-3">
+      <span [class]="item.role === 'user' ? 'max-w-[50%] bg-black text-white p-2 border rounded me-auto' : 'max-w-[50%] bg-gray-200 p-2 border rounded text-black ms-auto'">{{ item.content }}</span>
+    </div>
+  </div>
+
+  <div class="w-full mt-2">
+    <form [formGroup]="messageForm" class="flex align-center w-full">
+      <app-shared-input class="w-full" [control]="this.getControl('message')" formControlName="message" id="message" type="email" label="Message" />
+      <app-shared-button class="ms-1" label="Send" [disabled]="!messageForm.valid" />
+    </form>
+  </div>
+</div>

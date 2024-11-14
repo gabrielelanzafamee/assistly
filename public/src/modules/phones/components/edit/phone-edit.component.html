@@ -1,0 +1,14 @@
+<div class="content">
+  <form>
+
+  </form>
+</div>
+<h2 mat-dialog-title>Edit Phone</h2>
+<mat-dialog-content>
+  <p>ID: {{ data.phone._id }}</p>
+  <p>Phone Number: {{ data.phone.phoneNumber }}</p>
+  <p>Friendly Name: {{ data.phone.friendlyName }}</p>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="close()">Close</button>
+</mat-dialog-actions>

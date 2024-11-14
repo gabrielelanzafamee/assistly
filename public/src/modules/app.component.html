@@ -1,0 +1,9 @@
+<div [class]="(isAuthenticated$ | async) === true ? 'app-container' : 'app-container no-auth'">
+  <!-- Sidebar, visible only if the user is authenticated -->
+  <app-sidebar *ngIf="isAuthenticated$ | async" [items]="sidebarItems" />
+
+  <!-- Main content area -->
+  <div class="content w-[100%] h-[100%]">
+    <router-outlet></router-outlet>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="file-upload w-full">
+  <!-- Drag-and-drop zone -->
+  <div
+    class="relative w-full h-32 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg flex justify-center items-center cursor-pointer"
+    (dragover)="onDragOver($event)"
+    (drop)="onDrop($event)"
+  >
+    <p class="text-gray-500">Drop files here or click to upload</p>
+    <input
+      [id]="id"
+      [name]="id"
+      type="file"
+      [attr.multiple]="true"
+      (change)="onFileChange($event)"
+      class="absolute inset-0 opacity-0 cursor-pointer"
+    />
+  </div>
+
+  <!-- Uploaded files list -->
+  <ul class="mt-4">
+    <li *ngFor="let file of files; let i = index" class="bg-white p-4 rounded border flex justify-between items-center mb-2">
+      <span>{{ file.name }}</span>
+      <app-shared-button label="Remove" (click)="removeFile(i)"></app-shared-button>
+    </li>
+  </ul>
+</div>

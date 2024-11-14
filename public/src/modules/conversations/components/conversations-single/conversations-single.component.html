@@ -1,0 +1,18 @@
+<div class="form-contrainer w-full h-full">
+  <div class="messages-container w-full max-h-[728px] overflow-scroll">
+    <div *ngFor="let item of messages" class="message-item flex flex-col mb-4">
+      <span [class]="item.type === 'inbound' ? 'max-w-[50%] bg-black text-white p-2 border rounded me-auto' : 'max-w-[50%] bg-gray-200 p-2 border rounded text-black ms-auto'">{{ item.content }}</span>
+    </div>
+  </div>
+
+  <div class="w-full mt-4">
+    <form (ngSubmit)="onSendMessage($event)" [formGroup]="messageForm" class="flex items-center w-full">
+      <app-shared-input class="w-full" [control]="this.getControl('message')" formControlName="message" id="message" type="email" label="Message" />
+      <app-shared-button class="ms-1" label="Send" type="submit" [disabled]="!messageForm.valid" />
+    </form>
+
+    <hr class="my-2" />
+
+    <app-shared-switch (onSwitchChange)="onSwitchChange($event)" [control]="this.automaticReply" id="automaticReply" label="Automatic Reply"  />
+  </div>
+</div>

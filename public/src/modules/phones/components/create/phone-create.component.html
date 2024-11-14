@@ -1,0 +1,15 @@
+<div class="form-contrainer w-full h-full flex justify-center items-center">
+  <form (ngSubmit)="onSubmit($event)" [formGroup]="phoneForm" class="form one-column w-full">
+
+    <div class="flex flex-row space-x-2">
+      <div class="w-6/12">
+        <app-shared-input [control]="this.getControl('friendlyName')" class="block" formControlName="friendlyName" id="friendlyName" type="text" label="Name"></app-shared-input>
+      </div>
+      <div class="w-6/12">
+        <app-shared-select [control]="this.getControl('phoneNumber')" [options]="availablePhones" formControlName="phoneNumber" id="phoneNumber"></app-shared-select>
+      </div>
+    </div>
+
+    <app-shared-button class="mt-5 block" type="submit" label="Confirm" [disabled]="!phoneForm.valid" />
+  </form>
+</div>

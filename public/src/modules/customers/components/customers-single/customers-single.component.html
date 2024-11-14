@@ -1,0 +1,168 @@
+<div class="customer-information p-6 max-w-7xl mx-auto">
+  <!-- Basic Information -->
+  <div class="mb-8">
+    <h2 class="!text-2xl !font-bold mb-4 text-gray-800">Basic Information</h2>
+    <div class="grid grid-cols-2 gap-6">
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">First Name</div>
+        <div class="info-block-value">{{ customer.firstName }}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Last Name</div>
+        <div class="info-block-value">{{ customer.lastName }}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Email</div>
+        <div class="info-block-value">{{ customer.email }}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Phone</div>
+        <div class="info-block-value">{{ customer.phoneNumber || 'Not provided' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Preferences -->
+  <div class="mb-8">
+    <h2 class="!text-2xl !font-bold mb-4 text-gray-800">Contact Preferences</h2>
+    <div class="grid grid-cols-2 gap-6">
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Preferred Contact Method</div>
+        <div class="info-block-value capitalize">{{ customer.preferredContactMethod || 'n/a' }}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Preferred Language</div>
+        <div class="info-block-value">{{ customer.preferredLanguage }}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Marketing Consent</div>
+        <div class="info-block-value">
+          <span class="px-2 py-1 rounded-full text-sm"
+                [ngClass]="customer.marketingConsent ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+            {{ customer.marketingConsent ? 'Yes' : 'No' }}
+          </span>
+        </div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Newsletter</div>
+        <div class="info-block-value">
+          <span class="px-2 py-1 rounded-full text-sm"
+                [ngClass]="customer.newsletterSubscribed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+            {{ customer.newsletterSubscribed ? 'Subscribed' : 'Not Subscribed' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Address -->
+  <div class="mb-8" *ngIf="customer.address">
+    <h2 class="!text-2xl !font-bold mb-4 text-gray-800">Address</h2>
+    <div class="grid grid-cols-2 gap-6">
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Street</div>
+        <div class="info-block-value">{{ customer.address.street || 'Not provided' }}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">City</div>
+        <div class="info-block-value">{{ customer.address.city || 'Not provided' }}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">State</div>
+        <div class="info-block-value">{{ customer.address.state || 'Not provided' }}</div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Country</div>
+        <div class="info-block-value">{{ customer.address.country || 'Not provided' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Status -->
+  <div class="mb-8">
+    <h2 class="!text-2xl !font-bold mb-4 text-gray-800">Account Information</h2>
+    <div class="grid grid-cols-2 gap-6">
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Customer Status</div>
+        <div class="info-block-value">
+          <span class="px-2 py-1 rounded-full text-sm capitalize"
+                [ngClass]="{
+                  'bg-green-100 text-green-800': customer.customerStatus === 'active',
+                  'bg-red-100 text-red-800': customer.customerStatus === 'inactive',
+                  'bg-yellow-100 text-yellow-800': customer.customerStatus === 'pending',
+                  'bg-gray-100 text-gray-800': customer.customerStatus === 'blocked'
+                }">
+            {{ customer.customerStatus }}
+          </span>
+        </div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Service Level</div>
+        <div class="info-block-value">
+          <span class="px-2 py-1 rounded-full text-sm capitalize"
+                [ngClass]="{
+                  'bg-green-100 text-green-800': customer.serviceLevel === 'basic',
+                  'bg-blue-100 text-blue-800': customer.serviceLevel === 'premium',
+                  'bg-purple-100 text-purple-800': customer.serviceLevel === 'enterprise'
+                }">
+            {{ customer.serviceLevel }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactions -->
+  <div class="mb-8" *ngIf="customer.interactions?.length">
+    <h2 class="!text-2xl !font-bold mb-4 text-gray-800">Recent Interactions</h2>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Content</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sentiment</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let interaction of customer.interactions.slice(0, 5)">
+            <td class="px-6 py-4">{{ interaction.timestamp | date:'short' }}</td>
+            <td class="px-6 py-4 capitalize">{{ interaction.type }}</td>
+            <td class="px-6 py-4">{{ interaction.content }}</td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 rounded-full text-sm capitalize"
+                    [ngClass]="{
+                      'bg-green-100 text-green-800': interaction.sentiment === 'positive',
+                      'bg-yellow-100 text-yellow-800': interaction.sentiment === 'neutral',
+                      'bg-red-100 text-red-800': interaction.sentiment === 'negative'
+                    }">
+                {{ interaction.sentiment }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Preferences -->
+  <div class="mb-8">
+    <h2 class="!text-2xl !font-bold mb-4 text-gray-800">Preferences</h2>
+    <div class="grid grid-cols-2 gap-6">
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Product Interests</div>
+        <div class="info-block-value flex flex-wrap gap-2">
+          <span *ngFor="let interest of customer.preferences.productInterests"
+                class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+            {{ interest }}
+          </span>
+        </div>
+      </div>
+      <div class="info-block">
+        <div class="info-block-title font-semibold text-gray-600">Communication Frequency</div>
+        <div class="info-block-value">{{ customer.preferences.communicationFrequency }}</div>
+      </div>
+    </div>
+  </div>
+</div>

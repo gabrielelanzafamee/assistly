@@ -1,0 +1,33 @@
+<div class="form-contrainer w-full h-full flex justify-center items-center">
+  <form (ngSubmit)="onSubmit($event)" [formGroup]="assistantForm" class="form one-column w-full">
+
+    <div class="flex flex-row space-x-2 mb-4">
+      <div class="w-6/12">
+        <app-shared-input [control]="this.getControl('name')" class="block" formControlName="name" id="name" type="text" label="Name"></app-shared-input>
+      </div>
+      <div class="w-6/12">
+        <app-shared-select [control]="this.getControl('numberId')" [options]="phones" formControlName="numberId" id="numberId"></app-shared-select>
+      </div>
+    </div>
+
+    <div class="flex flex-row space-x-2 mb-4">
+      <div class="w-12/12 w-full">
+        <app-shared-select [control]="this.getControl('type')" [options]="types" formControlName="type" id="type"></app-shared-select>
+      </div>
+    </div>
+
+    <div class="flex flex-row space-x-2 mb-4">
+      <div class="w-12/12 w-full">
+        <app-shared-select [multiple]="true" [control]="this.getControl('knowledge')" [options]="knowledges" formControlName="knowledge" id="knowledge"></app-shared-select>
+      </div>
+    </div>
+
+    <div class="flex flex-row space-x-2 mb-4">
+      <div class="w-12/12 w-full">
+        <app-shared-textarea [control]="this.getControl('instructions')" class="block" formControlName="instructions" id="instructions" label="Instructions"></app-shared-textarea>
+      </div>
+    </div>
+
+    <app-shared-button class="mt-5 block" type="submit" label="Confirm" [disabled]="!assistantForm.valid" />
+  </form>
+</div>

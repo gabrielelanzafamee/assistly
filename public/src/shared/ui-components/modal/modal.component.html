@@ -1,0 +1,33 @@
+<div
+  class="fixed inset-0 z-[999] grid h-screen w-screen place-items-center bg-black bg-opacity-60 backdrop-blur-sm transition-opacity duration-300"
+  [ngClass]="{
+    'pointer-events-none opacity-0': !isOpen,
+    'opacity-100': isOpen,
+  }"
+>
+  <div
+    class="relative m-4 p-4 w-[50%] rounded-lg bg-white shadow-sm"
+  >
+    <div class="flex flex-row align-center mb-4">
+      <div
+        class="flex shrink-0 items-center text-xl font-medium text-slate-800"
+      >
+        <ng-content select="[modal-title]"></ng-content>
+      </div>
+      <div class="ms-auto flex shrink-0 flex-wrap items-center">
+        <button
+          class="rounded-md border border-transparent py-2 px-4 text-center text-sm transition-all text-slate-600 hover:bg-slate-100"
+          (click)="closeModal()"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+    <div
+      class="relative w-full border-t border-slate-200 pt-4 leading-normal text-slate-600 font-light"
+    >
+      <!-- This is where the dynamic component will be loaded -->
+      <ng-template #modalContent></ng-template>
+    </div>
+  </div>
+</div>

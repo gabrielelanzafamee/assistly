@@ -1,0 +1,88 @@
+<div
+  class="relative flex flex-col w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-xl bg-clip-border"
+>
+  <table class="w-full text-left table-auto min-w-max">
+    <thead>
+      <tr>
+        <th
+          class="p-4 border-b border-blue-gray-100 bg-gray-100"
+          *ngFor="let column of columns"
+        >
+          <p
+            class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70 !mb-0"
+          >
+            {{ column.label }}
+          </p>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of dataSource">
+        <td
+          class="p-4 border-b border-blue-gray-50"
+          *ngFor="let column of columns"
+        >
+          <!-- Actions column -->
+          <ng-container *ngIf="isActions(column)">
+            <div class="flex items-center">
+              <button
+                *ngIf="column.onView"
+                style="line-height: 0"
+                class="px-2"
+                (click)="handleAction('view', $event, column.onView, row)"
+              >
+                <mat-icon class="text-gray-700 hover:text-gray-900"
+                  >visibility</mat-icon
+                >
+              </button>
+              <button
+                *ngIf="column.onEdit"
+                style="line-height: 0"
+                class="px-2"
+                (click)="handleAction('edit', $event, column.onEdit, row)"
+              >
+                <mat-icon class="text-gray-700 hover:text-gray-900"
+                  >edit</mat-icon
+                >
+              </button>
+              <button
+                *ngIf="column.onDelete"
+                style="line-height: 0"
+                class="px-2"
+                (click)="handleAction('delete', $event, column.onDelete, row)"
+              >
+                <mat-icon class="text-gray-700 hover:text-gray-900"
+                  >delete</mat-icon
+                >
+              </button>
+            </div>
+          </ng-container>
+
+          <!-- Render text type -->
+          <ng-container *ngIf="isText(column)">
+            <p
+              class="!mb-0 block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900"
+            >
+              {{ row[column.key] }}
+            </p>
+          </ng-container>
+
+          <!-- Render link type -->
+          <ng-container *ngIf="isLink(column)">
+            <a [href]="row[column.key].linkUrl" class="text-blue-500">{{
+              row[column.key].label
+            }}</a>
+          </ng-container>
+
+          <!-- Render button type -->
+          <ng-container *ngIf="isButton(column)">
+            <app-shared-button
+              (click)="row[column.key].function($event)"
+              [label]="row[column.key].label"
+            ></app-shared-button>
+          </ng-container>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,28 @@
+<div class="w-full">
+  <div class="relative">
+    <textarea
+      [id]="id"
+      [name]="id"
+      [value]="value"
+      (input)="onInputChange($event)"
+      (blur)="onTouched()"
+      [ngClass]="{'border-red-400': control.invalid && control.touched}"
+      class="peer w-full d-block bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+    ></textarea>
+
+    <!-- Display error message -->
+    <p *ngIf="control.invalid && control.touched" class="text-xs !mt-1 text-red-400">
+      {{ getErrorMessage() }}
+    </p>
+
+    @if (value.length < 1) {
+      <label class="absolute cursor-text bg-white px-1 left-2.5 top-2.5 text-slate-400 text-sm transition-all transform origin-left peer-focus:-top-2 peer-focus:left-2.5 peer-focus:text-xs peer-focus:text-slate-400 peer-focus:scale-90">
+        {{ label }}
+      </label>
+    } @else {
+      <label class="absolute cursor-text bg-white px-1 transition-all transform origin-left -top-2 left-2.5 text-xs text-slate-400 scale-90">
+        {{ label }}
+      </label>
+    }
+  </div>
+</div>
