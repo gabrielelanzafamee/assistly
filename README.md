@@ -1,4 +1,4 @@
-# AI Customer Service Platform
+# Assistly
 
 A modern, scalable customer service platform built with NestJS and Angular, featuring AI-powered interactions, customer management, and multi-channel communication capabilities.
 
