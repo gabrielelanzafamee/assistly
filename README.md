@@ -30,8 +30,8 @@ Before you begin, ensure you have the following installed:
 ## Getting Started
 
 1. Clone the repository:
-`git clone https://github.com/gabrielelanzafamee/assistly.git`
-`cd assistly`
+- `git clone https://github.com/gabrielelanzafamee/assistly.git`
+- `cd assistly`
 
 2. Environment Setup
 Create .env file in the root directory with the following variables:
@@ -68,20 +68,20 @@ NODE_ENV=development
 3. Install Dependencies
 
 For the backend:
-`npm install`
+- `npm install`
 
 For the frontend:
-`cd public`
-`npm install`
+- `cd public`
+- `npm install`
 
 4. Run the Application
 
 Start the backend server:
-`npm run start:dev`
+- `npm run start:dev`
 
 Start the frontend application:
-`cd public`
-`npm run start`
+- `cd public`
+- `npm run start`
 
 The application will be available at:
 - Frontend: http://localhost:4200
@@ -145,12 +145,12 @@ Please ensure your PR adheres to our coding standards and includes appropriate t
 ## Running Tests
 
 Backend tests:
-`npm run test`
-`npm run test:e2e`
+- `npm run test`
+- `npm run test:e2e`
 
 Frontend tests:
-`cd public`
-`ng test`
+- `cd public`
+- `ng test`
 
 ## API Documentation
 
