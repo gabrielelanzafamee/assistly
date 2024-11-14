@@ -89,7 +89,7 @@ The application will be available at:
 - API Documentation: http://localhost:5000/api/v1
 
 ## Project Structure
-
+```
 src/                  # Backend source code (NestJS)
 ├── core/            # Core functionality
 │   ├── config/      # Configuration
@@ -106,6 +106,7 @@ public/              # Frontend source code (Angular)
 │   ├── modules/     # Feature modules
 │   ├── shared/      # Shared components
 │   └── core/        # Core services
+```
 
 ## Configuration
 
