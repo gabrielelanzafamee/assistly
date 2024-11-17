@@ -30,6 +30,7 @@ export class TwilioService {
 	}
 
 	async createPhoneNumber(data: ICreatePhoneNumberTwilio) {
+		// save usage
 		return await this.client.incomingPhoneNumbers.create({
 			...data,
 			statusCallbackMethod: 'POST',
@@ -55,6 +56,7 @@ export class TwilioService {
 	}
 
 	async sendMessage(payload: SendMessagePayload) {
+		// todo: save usage
 		return await this.client.messages.create(payload);
 	}
 

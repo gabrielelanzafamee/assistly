@@ -97,11 +97,18 @@ export class WebhooksService {
 			organizationId: phone.organization._id.toString()
 		}
 
+    var inputTotalTokens = 0; // use tiktoken to save total number
+    var outputTotalTokens = 0;
+
 		for await (const chunk of this.openaiService.streamChatCompletion(messages, {}, knowledges, null, functionContext)) {
+      outputTotalTokens += 1;
+
       if (chunk.content) {
         finalContent += chunk.content;
       }
     }
+
+    // save openai
     
     await this.messagesService.reply(from, finalContent, conversation._id.toString(), phone.organization._id.toString(), params);
   }
