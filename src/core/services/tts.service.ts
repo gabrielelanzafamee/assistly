@@ -4,6 +4,8 @@ import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { ConfigService } from "../config/config.service";
 
+// integrate save utilisation here
+
 @Injectable()
 export class TextToSpeechService {
 	private nextExpectedIndex: number;

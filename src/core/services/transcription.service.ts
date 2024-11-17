@@ -5,6 +5,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '../config/config.service';
 
+// save utilisation deepgram here
+
 @Injectable()
 export class TranscriptionService {
 	private dgConnection: any;

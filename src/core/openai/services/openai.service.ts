@@ -17,6 +17,9 @@ import { ToolRegistryService } from './tool-registry.service';
 import { Stream } from 'openai/streaming';
 import { ChatCompletionChunk } from 'openai/resources';
 
+
+// integrate here usage save infomation
+
 @Injectable()
 export class OpenAIService {
 	private readonly client: OpenAI;

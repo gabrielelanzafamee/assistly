@@ -108,7 +108,7 @@ export class WebhooksService {
       }
     }
 
-    // save openai
+    // save openai usage
     
     await this.messagesService.reply(from, finalContent, conversation._id.toString(), phone.organization._id.toString(), params);
   }

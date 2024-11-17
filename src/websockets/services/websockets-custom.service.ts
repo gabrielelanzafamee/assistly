@@ -10,6 +10,8 @@ import { TranscriptionService } from 'src/core/services/transcription.service';
 import { TextToSpeechService } from 'src/core/services/tts.service';
 import { OpenAIService } from 'src/core/openai/services/openai.service';
 
+// save utilisation of calls by fetching minutes and all the other stuffs
+
 @Injectable()
 export class WebsocketsCustomService {
   private clients: Map<string, WSClientData>;
