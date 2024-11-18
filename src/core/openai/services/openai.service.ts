@@ -3,6 +3,7 @@ import { OpenAI } from 'openai';
 import { ConfigService } from 'src/core/config/config.service';
 import { RateLimitService } from './rate-limit.service';
 import {
+	ChatCompletion,
 	ChatCompletionCreateParams,
 	ChatCompletionTool,
 	EmbeddingCreateParams,
@@ -16,6 +17,8 @@ import { OpenAIFunctionService } from './openai-function.service';
 import { ToolRegistryService } from './tool-registry.service';
 import { Stream } from 'openai/streaming';
 import { ChatCompletionChunk } from 'openai/resources';
+import { UsageService } from '../../../usage/usage.service';
+import { APIPromise } from 'openai/core';
 
 
 // integrate here usage save infomation
@@ -33,6 +36,7 @@ export class OpenAIService {
 		private functionService: OpenAIFunctionService,
 		private toolRegistry: ToolRegistryService,
 		@Inject(forwardRef(() => ToolsService)) private toolsService: ToolsService,
+		private usageService: UsageService
 	) {
 		const config = this.configService.getOpenAIConfig();
 		this.client = new OpenAI({ apiKey: config.apiKey });
@@ -60,35 +64,96 @@ export class OpenAIService {
 		}
 	}
 
-	async chat(
+	async *chat(
 		messages: Array<any>,
 		config: Partial<ChatCompletionCreateParams>,
 		knowledges: KnowledgeChunk[] = [],
 		utool: ITool = null,
-	): Promise<any> {
+		organizationId: string = null
+	): any {
 		await this.injectKnowledgeContext(messages, knowledges, utool);
-		return this.rateLimitService.handleRateLimitedRequest(() =>
+
+		if (!config.stream) {
+			const response = await this.rateLimitService.handleRateLimitedRequest(() =>
+				this.client.chat.completions.create({
+					model: config.model || this.model,
+					messages,
+					tools: this.toolRegistry.getToolSchemas() as ChatCompletionTool[],
+					...config,
+				})
+			) as ChatCompletion;
+
+			if (organizationId) {
+				await this.usageService.recordUsage(organizationId, 'openai', 'input_tokens', response.usage.prompt_tokens);
+				await this.usageService.recordUsage(organizationId, 'openai', 'output_tokens', response.usage.completion_tokens);
+			}
+
+			return response;
+		}
+
+		const stream = await this.rateLimitService.handleRateLimitedRequest(() =>
 			this.client.chat.completions.create({
-				model: config.model || this.model,
-				messages,
-				tools: this.toolRegistry.getToolSchemas() as ChatCompletionTool[],
-				...config,
-			}),
-		);
+					model: config.model || this.model,
+					messages,
+					tools: this.toolRegistry.getToolSchemas() as ChatCompletionTool[],
+					...config,
+				})
+		) as Stream<ChatCompletionChunk>;
+
+		let totalInputTokens = 0;
+		let totalOutputTokens = 0;
+		let isFirstChunk = true;
+
+		try {
+			for await (const chunk of stream) {
+				if (isFirstChunk && chunk.usage) {
+					totalInputTokens = chunk.usage.prompt_tokens;
+					isFirstChunk = false;
+				}
+				if (chunk.usage?.completion_tokens) {
+					totalOutputTokens += chunk.usage.completion_tokens;
+				}
+				yield chunk;
+			}
+		} finally {
+			if (organizationId && (totalInputTokens > 0 || totalOutputTokens > 0)) {
+				await Promise.all([
+					totalInputTokens > 0 && this.usageService.recordUsage(organizationId, 'openai', 'input_tokens', totalInputTokens),
+					totalOutputTokens > 0 && this.usageService.recordUsage(organizationId, 'openai', 'output_tokens', totalOutputTokens)
+				]);
+			}
+		}
 	}
 
 	async createVector(
 		input: string,
 		params: Partial<EmbeddingCreateParams> = {},
+		organizationId: string = null
 	): Promise<any> {
-		return this.rateLimitService.handleRateLimitedRequest(() =>
-			this.client.embeddings.create({
-				model: params.model || this.embModel,
-				input,
-				encoding_format: 'float',
-				...params,
-			}),
-		);
+		try {
+			const response = await this.rateLimitService.handleRateLimitedRequest(() =>
+				this.client.embeddings.create({
+					model: params.model || this.embModel,
+					input,
+					encoding_format: 'float',
+					...params,
+				}),
+			);
+
+			if (organizationId && response.usage?.total_tokens) {
+				await this.usageService.recordUsage(
+					organizationId,
+					'openai',
+					'embedding_tokens',
+					response.usage.total_tokens
+				);
+			}
+
+			return response;
+		} catch (error) {
+			console.error('Error creating vector embedding:', error);
+			throw error;
+		}
 	}
 
 	async chatEventStream(
@@ -98,9 +163,10 @@ export class OpenAIService {
 		clientId: string,
 		knowledges: KnowledgeChunk[] = [],
 		tool: ITool = null,
+		organizationId: string = null
 	) {
 		const gptStartTime = new Date().getTime();
-
+		
 		try {
 			this.streamService.cleanupClientContent(clientId);
 
@@ -109,6 +175,7 @@ export class OpenAIService {
 				config,
 				knowledges,
 				tool,
+				{ organizationId }
 			)) {
 				if (chunk.error) {
 					await this.streamService.emitStreamResponse(
@@ -131,7 +198,6 @@ export class OpenAIService {
 			}
 		} catch (error) {
 			console.error('Error in chat stream:', error);
-			this.streamService.cleanupClientContent(clientId);
 			await this.streamService.emitStreamResponse(
 				clientId,
 				'Sorry, an error occurred.',
@@ -164,6 +230,7 @@ export class OpenAIService {
 				config,
 				knowledges,
 				tool,
+				params?.organizationId
 			);
 
 			for await (const chunk of stream) {
@@ -179,12 +246,11 @@ export class OpenAIService {
 
 				if (finishReason === 'tool_calls' && functionName && functionArgs) {
 					try {
-						const functionResult =
-							await this.functionService.handleFunctionCall(
-								functionName,
-								functionArgs,
-								params,
-							);
+						const functionResult = await this.functionService.handleFunctionCall(
+							functionName,
+							functionArgs,
+							params,
+						);
 
 						messages.push({
 							role: 'function',
@@ -197,6 +263,7 @@ export class OpenAIService {
 							config,
 							knowledges,
 							tool,
+							params
 						);
 
 						for await (const token of continuationStream) {
@@ -205,6 +272,7 @@ export class OpenAIService {
 
 						return;
 					} catch (error) {
+						console.error(`Function call error:`, error);
 						yield {
 							content: '',
 							finishReason: 'error',
@@ -219,6 +287,7 @@ export class OpenAIService {
 				}
 			}
 		} catch (error) {
+			console.error('Stream chat completion error:', error);
 			yield {
 				content: '',
 				finishReason: 'error',
@@ -232,6 +301,7 @@ export class OpenAIService {
 		config: Partial<ChatCompletionCreateParams>,
 		knowledges: KnowledgeChunk[] = [],
 		tool: ITool = null,
+		organizationId: string = null
 	): Promise<Stream<ChatCompletionChunk>> {
 		return (await this.chat(
 			messages,
@@ -240,7 +310,8 @@ export class OpenAIService {
 				stream: true,
 			},
 			knowledges,
-			tool
+			tool,
+			organizationId
 		)) as Stream<ChatCompletionChunk>;
 	}
 

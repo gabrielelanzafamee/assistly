@@ -43,7 +43,7 @@ export class WebsocketsCustomService {
   @OnEvent('call.start')
   async handleCallStart(clientId: string) {
 		const client = this.clients.get(clientId);
-		await this.transcriptionService.start(clientId);
+		await this.transcriptionService.start(clientId, client.organizationId);
 		await this.callsService.update(client.callId, client.organizationId, { status: CallStatus.IN_PROGRESS })
 		await this.eventEmitter.emit('openai.generation', clientId, {
 			partialResponse: 'Hello there, who is calling?',
@@ -72,7 +72,7 @@ export class WebsocketsCustomService {
 		if (client) {
 			client.messages.push({ role: 'user', content: text });
 			this.callsService.addTranscript(client.callId, client.organizationId, 'user', text);
-			const query = (await this.openaiService.createVector(text)).data[0].embedding;
+			const query = (await this.openaiService.createVector(text, {}, client.organizationId)).data[0].embedding;
 			const knowledges = (await this.knowledgesService.findWithSimilarities(query, new mongoose.Types.ObjectId(client.organizationId))).map(item => { 
 				return { 
 					content: item.chunks.content,
@@ -80,7 +80,7 @@ export class WebsocketsCustomService {
 					vector: []
 				}
 			}).flat();
-			this.openaiService.chatEventStream(this.iterationCount, client.messages, {}, clientId, knowledges);
+			this.openaiService.chatEventStream(this.iterationCount, client.messages, {}, clientId, knowledges, null, client.organizationId);
 		}
 	}
 
@@ -90,7 +90,7 @@ export class WebsocketsCustomService {
     if (client) {
       client.messages.push({ role: 'assistant', content: reply.partialResponse });
 			this.callsService.addTranscript(client.callId, client.organizationId, 'bot', reply.partialResponse);
-      this.textToSpeechService.generate(reply, reply.time, icount, clientId);
+      this.textToSpeechService.generate(reply, reply.time, icount, clientId, client.organizationId);
     }
   }
 

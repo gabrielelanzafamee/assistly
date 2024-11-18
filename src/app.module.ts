@@ -17,6 +17,7 @@ import { OpenAIModule } from './core/openai/openai.module';
 import { ConfigService } from './core/config/config.service';
 import { ToolsModule } from './tools/tools.module';
 import { CustomersModule } from './customers/customers.module';
+import { UsageModule } from './usage/usage.module';
 
 const configService = new ConfigService();
 const config = configService.getSystemConfig();
@@ -38,7 +39,8 @@ const config = configService.getSystemConfig();
 		CallsModule,
 		OpenAIModule,
 		ToolsModule,
-		CustomersModule
+		CustomersModule,
+		UsageModule
 	],
   controllers: [],
   providers: [],

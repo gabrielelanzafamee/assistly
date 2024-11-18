@@ -19,8 +19,8 @@ export class ToolsService {
 
   async create(data: CreateToolDto, organizaitonId: string) {
 		// create vectors
-		const nameVector = (await this.openaiService.createVector(data.name)).data[0].embedding;
-		const descriptionVector = (await this.openaiService.createVector(data.description)).data[0].embedding;
+		const nameVector = (await this.openaiService.createVector(data.name, {}, organizaitonId)).data[0].embedding;
+		const descriptionVector = (await this.openaiService.createVector(data.description, {}, organizaitonId)).data[0].embedding;
 		return await new this.toolModel({
 			...data,
 			vectors: {
@@ -44,8 +44,8 @@ export class ToolsService {
   }
 	
   async update(id: string, data: UpdateToolDto, organizaitonId: string) {
-		const nameVector = (await this.openaiService.createVector(data.name)).data[0].embedding;
-		const descriptionVector = (await this.openaiService.createVector(data.description)).data[0].embedding;
+		const nameVector = (await this.openaiService.createVector(data.name, {}, organizaitonId)).data[0].embedding;
+		const descriptionVector = (await this.openaiService.createVector(data.description, {}, organizaitonId)).data[0].embedding;
 		return await this.toolModel.updateOne({ organization: organizaitonId, _id: id }, {
 			...data,
 			vectors: {

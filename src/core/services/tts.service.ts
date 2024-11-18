@@ -1,8 +1,8 @@
-import fs from "fs";
 import { Buffer } from "buffer";
 import { Injectable } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { ConfigService } from "../config/config.service";
+import { UsageService } from "src/usage/usage.service";
 
 // integrate save utilisation here
 
@@ -14,14 +14,15 @@ export class TextToSpeechService {
 
   constructor(
 		private eventEmitter: EventEmitter2,
-		private configService: ConfigService
+		private configService: ConfigService,
+		private usageService: UsageService
 	) {
 		this.config = this.configService.getSystemConfig();
 		this.nextExpectedIndex = 0;
     this.speechBuffer = {};
 	}
 
-  async generate(gptReply, time = 0, icount, clientId: string) {
+  async generate(gptReply, time = 0, icount, clientId: string, organizationId: string) {
     if (!gptReply) {
       return;
     }
@@ -84,7 +85,16 @@ export class TextToSpeechService {
 			const buffer = await blob.arrayBuffer();
 			const audio = Buffer.from(buffer).toString('base64');
 			this.eventEmitter.emit('tts.audio', clientId, partialResponseIndex, audio, partialResponse, icount);
-
+			
+			if (organizationId) {
+				await this.usageService.recordUsage(
+					organizationId,
+					'elevenlabs',
+					'characters',
+					partialResponse.length
+				);
+			}
+		
       const ttsEndTime = new Date().getTime();
 
       console.log(`TTS -> Audio generated in ${ttsEndTime - ttsStartTime}ms`);

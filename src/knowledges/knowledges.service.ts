@@ -29,7 +29,7 @@ export class KnowledgesService {
 		const chunks = (
 			await Promise.all(
 				files.map(async (file) => {
-					return await this.processDocument(file);
+					return await this.processDocument(file, organizationId);
 				}),
 			)
 		).flat();
@@ -59,16 +59,15 @@ export class KnowledgesService {
 		return await this.knowledgeModel.deleteOne({ _id: knowledgeId, organization: organizaitonId });
 	}
 
-	async processDocument(file: Express.Multer.File): Promise<any> {
+	async processDocument(file: Express.Multer.File, organizationId: string = null): Promise<any> {
 		const chunkSize: number = 1024;
-		const chunks: { filename: string; content: string; vector: number[] }[] =
-			[];
+		const chunks: { filename: string; content: string; vector: number[] }[] = [];
 
 		const content = await extractTextFromFile(file);
 
 		for (let i = 0; i < content.length; i += chunkSize) {
 			const chunk = content.substring(i, i + chunkSize);
-			const vector = await this.openaiService.createVector(chunk);
+			const vector = await this.openaiService.createVector(chunk, {}, organizationId);
 			chunks.push({
 				filename: file.filename || file.originalname,
 				content: chunk,

@@ -3,6 +3,7 @@ import { Twilio } from 'twilio';
 
 import { SendMessagePayload } from 'src/core/interfaces/messages.interface';
 import { ConfigService } from '../config/config.service';
+import { UsageService } from 'src/usage/usage.service';
 
 interface ICreatePhoneNumberTwilio {
 	phoneNumber: string;
@@ -14,15 +15,14 @@ interface ICreatePhoneNumberTwilio {
 	smsFallback: string;
 }
 
-// save utilisation here
-
 @Injectable()
 export class TwilioService {
 	client: Twilio;
 	config: any;
 
 	constructor(
-		private configService: ConfigService
+		private configService: ConfigService,
+		private usageService: UsageService
 	) {
 		this.config = this.configService.getSystemConfig();
 		this.client = new Twilio(
@@ -31,35 +31,112 @@ export class TwilioService {
 		);
 	}
 
-	async createPhoneNumber(data: ICreatePhoneNumberTwilio) {
-		// save usage
-		return await this.client.incomingPhoneNumbers.create({
-			...data,
-			statusCallbackMethod: 'POST',
-			voiceMethod: 'POST',
-			smsMethod: 'POST',
-			smsFallbackMethod: 'POST',
-			voiceFallbackMethod: 'POST',
-			bundleSid: this.config.twilio.TWILIO_BUNDLE_SID,
-			addressSid: this.config.twilio.TWILIO_ADDRESS_SID
-		})
+	async createPhoneNumber(data: ICreatePhoneNumberTwilio, organizationId: string) {
+		try {
+			const number = await this.client.incomingPhoneNumbers.create({
+				...data,
+				statusCallbackMethod: 'POST',
+				voiceMethod: 'POST',
+				smsMethod: 'POST',
+				smsFallbackMethod: 'POST',
+				voiceFallbackMethod: 'POST',
+				bundleSid: this.config.twilio.TWILIO_BUNDLE_SID,
+				addressSid: this.config.twilio.TWILIO_ADDRESS_SID
+			});
+
+			if (organizationId) {
+				// Record first month's recurring charge
+				await this.usageService.recordUsage(
+					organizationId,
+					'twilio',
+					'phone_number',
+					1,
+					{
+						phoneNumberSid: number.sid,
+						phoneNumber: number.phoneNumber,
+						startDate: new Date().toISOString()
+					}
+				);
+			}
+
+			return number;
+		} catch (error) {
+			console.error('Error creating phone number:', error);
+			throw error;
+		}
 	}
 
 	async getAvailablePhoneNumbers(countryCode: string) {
-		return await this.client.availablePhoneNumbers(countryCode).mobile.list({
-			limit: 50,
-			smsEnabled: true,
-			voiceEnabled: true
-		})
+		try {
+			return await this.client.availablePhoneNumbers(countryCode).mobile.list({
+				limit: 50,
+				smsEnabled: true,
+				voiceEnabled: true
+			});
+		} catch (error) {
+			console.error('Error fetching available numbers:', error);
+			throw error;
+		}
 	}
 
-	async deletePhoneNumber(sid: string) {
-		return await this.client.incomingPhoneNumbers(sid).remove();
+	async deletePhoneNumber(sid: string, organizationId: string) {
+		try {
+			const result = await this.client.incomingPhoneNumbers(sid).remove();
+
+			if (organizationId) {
+				// Record phone number deletion to stop monthly charges
+				await this.usageService.recordUsage(
+					organizationId,
+					'twilio',
+					'phone_number',
+					1,
+					{
+						phoneNumberSid: sid,
+						deletionDate: new Date().toISOString()
+					}
+				);
+			}
+
+			return result;
+		} catch (error) {
+			console.error('Error deleting phone number:', error);
+			throw error;
+		}
 	}
 
-	async sendMessage(payload: SendMessagePayload) {
-		// todo: save usage
-		return await this.client.messages.create(payload);
+	async sendMessage(payload: SendMessagePayload, organizationId: string) {
+		try {
+			const message = await this.client.messages.create(payload);
+
+			if (organizationId) {
+				// Track SMS segments
+				const segments = Math.ceil((payload.body || '').length / 160);
+				await this.usageService.recordUsage(
+					organizationId,
+					'twilio',
+					'sms',
+					segments,
+					{
+						messageSid: message.sid
+					}
+				);
+
+				// Track MMS if media is included
+				// if (payload.mediaUrl) {
+				// 	await this.usageService.recordUsage(
+				// 		organizationId,
+				// 		'twilio',
+				// 		'mms_messages',
+				// 		1
+				// 	);
+				// }
+			}
+
+			return message;
+		} catch (error) {
+			console.error('Error sending message:', error);
+			throw error;
+		}
 	}
 
 	isE164(number: string) {

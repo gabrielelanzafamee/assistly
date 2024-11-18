@@ -14,5 +14,5 @@ export enum MessageStatus {
 	UNDELIVERED = 'undelivered',
 	FAILED = 'failed',
 	RECEIVED = 'received',
-	READ = 'Read'
+	READ = 'read'
 }

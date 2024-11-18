@@ -4,6 +4,7 @@ import { Buffer } from 'buffer';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '../config/config.service';
+import { UsageService } from 'src/usage/usage.service';
 
 // save utilisation deepgram here
 
@@ -18,12 +19,13 @@ export class TranscriptionService {
 
 	constructor(
 		public eventEmitter: EventEmitter2,
-		public configService: ConfigService
+		public configService: ConfigService,
+		private usageService: UsageService
 	) {
 		this.deepgram = createClient(this.configService.getSystemConfig().deepgram.DEEPGRAM_API_KEY);
 	}
 
-	async start(clientId: string) {
+	async start(clientId: string, organizationId: string) {
 		this.dgConnection = this.deepgram.listen.live({
 			encoding: 'mulaw',
 			sample_rate: 8000,
@@ -124,8 +126,24 @@ export class TranscriptionService {
 				console.log(JSON.stringify(metadata));
 			});
 
-			this.dgConnection.on(LiveTranscriptionEvents.Close, () => {
-				console.log('STT -> Deepgram connection closed');
+			this.dgConnection.on(LiveTranscriptionEvents.Close, (metadata) => {
+				console.log('STT -> deepgram close');
+				console.log(JSON.stringify(metadata));
+				// const data = JSON.parse(message);
+				// console.log('STT -> Deepgram connection closed');
+				// clearInterval(trackInterval);
+				// if (organizationId) {
+				// 	this.usageService.recordUsage(
+				// 		organizationId,
+				// 		'deepgram',
+				// 		'audio_seconds',
+				// 		(data.duration / 60)
+				// 	).then(() => {
+				// 		console.log('STT -> Deepgram usage recorded');
+				// 	}).catch((error) => {
+				// 		console.error('STT -> Error recording Deepgram usage', error);
+				// 	});
+				// }
 			});
 		});
 	}
