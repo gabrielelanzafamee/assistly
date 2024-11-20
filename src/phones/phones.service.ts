@@ -80,7 +80,7 @@ export class PhonesService {
 			statusCallback,
 			voiceFallback,
 			smsFallback
-		}));
+		}, organizationId));
 
 		if ('success' in phone && phone.success === false) {
 			// delete number
@@ -112,7 +112,7 @@ export class PhonesService {
 		const phone = await this.phoneModel.findOne({ _id: phoneNumberId, organization: organizationId });
 		assertion(phone, new NotFoundException('Phone number not found'));
 
-		const twilioResult = await tryCatchSafe(() => this.twilioService.deletePhoneNumber(phone.sid));
+		const twilioResult = await tryCatchSafe(() => this.twilioService.deletePhoneNumber(phone.sid, organizationId));
 
 		if (typeof twilioResult !== 'boolean' && 'success' in twilioResult && twilioResult.success === false) {
 			throw new InternalServerErrorException("Server Error, try again later")

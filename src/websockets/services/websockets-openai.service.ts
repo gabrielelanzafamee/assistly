@@ -61,6 +61,14 @@ export class WebsocketsOpenaiService {
 				if (response.type === 'response.content_part.done') {
 					this.callsService.addTranscript(client.callId, client.organizationId, 'bot', response.part.transcript);
 				}
+
+				if (response.type === 'response.done') {
+					const inputTokens = response.respone.usage.input_tokens;
+					const outputTokens = response.respone.usage.output_tokens;
+
+
+
+				}
 			} catch (error) {
 				console.error('Error processing OpenAI message:', error, 'Raw message:', data);
 			}
@@ -142,7 +150,7 @@ export class WebsocketsOpenaiService {
 	connectToRealtimeWS() {
     const config = this.configService.getOpenAIConfig();
     const ws = new WebSocket(
-      `wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview`,
+      `wss://api.openai.com/v1/realtime?model=gpt-4o-audio-preview-2024-10-01`,
       {
         headers: {
           Authorization: `Bearer ${config.apiKey}`,

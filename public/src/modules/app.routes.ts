@@ -8,6 +8,7 @@ import { knowledgesRoutes } from './knowledges/knowledges-routing.routes';
 import { conversationsRoutes } from './conversations/conversations-routing.routes';
 import { callsRoutes } from './calls/calls-routing.routes';
 import { customersRoutes } from './customers/customers-routing.routes';
+import { usersRoutes } from './users/users-routing.routes';
 
 export const routes: Routes = [
   { path: '', component: DashboardComponent, canActivate: [AuthGuard] },
@@ -17,5 +18,6 @@ export const routes: Routes = [
   ...knowledgesRoutes,
   ...conversationsRoutes,
   ...callsRoutes,
-  ...customersRoutes
+  ...customersRoutes,
+  ...usersRoutes
 ];

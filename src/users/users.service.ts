@@ -34,6 +34,14 @@ export class UsersService {
 	}
 
 	async update(id: string, organizationId: string, user: UpdateUserDto) {
+		if (user.password === '' || user.password === null || user.password === undefined) {
+			delete user.password;
+		} else {
+			user.password = await bcrypt.hash(user.password, 10);
+		}
+
+		console.log(user);
+
 		return await this.userModel.updateOne({ _id: id, organization: organizationId }, user);
 	}
 

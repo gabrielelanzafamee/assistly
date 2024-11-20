@@ -114,9 +114,10 @@ export class TwilioService {
 				await this.usageService.recordUsage(
 					organizationId,
 					'twilio',
-					'sms',
+					payload.from.includes('whatsapp:') ? 'whatsapp' : 'sms',
 					segments,
 					{
+						type: 'outbound',
 						messageSid: message.sid
 					}
 				);

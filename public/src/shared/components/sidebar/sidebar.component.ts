@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router'; // Add this import
 
 @Component({
   selector: 'app-sidebar',
@@ -10,4 +11,10 @@ import { Component, Input } from '@angular/core';
 })
 export class SidebarComponent {
   @Input() items: { link: string, class?: string, label: string, action: string, function?: Function }[] = [];
+
+  constructor(private router: Router) {} // Inject Router
+
+  isActive(link: string): boolean {
+    return this.router.url === link; // Check if the current route matches the link
+  }
 }

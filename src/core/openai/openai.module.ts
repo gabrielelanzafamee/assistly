@@ -8,9 +8,10 @@ import { ToolsModule } from 'src/tools/tools.module';
 import { CustomersModule } from 'src/customers/customers.module';
 import { ConfigModule } from 'src/core/config/config.module';
 import { CustomerTool } from './tools/customer.tool';
+import { UsageModule } from 'src/usage/usage.module';
 
 @Module({
-	imports: [ConfigModule, forwardRef(() => ToolsModule), CustomersModule],
+	imports: [ConfigModule, forwardRef(() => ToolsModule), CustomersModule, UsageModule],
 	providers: [
 		OpenAIService,
 		OpenAIStreamService,

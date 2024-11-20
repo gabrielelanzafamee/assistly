@@ -2,10 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { OrganizationDocument } from 'src/organizations/entities/organization.entity';
 
-export type UsageRecordDocument = HydratedDocument<UsageRecord>;
+export type UsageDocument = HydratedDocument<Usage>;
 
 @Schema()
-export class UsageRecord {
+export class Usage {
 	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' })
 	organization: OrganizationDocument;
 
@@ -21,11 +21,11 @@ export class UsageRecord {
   @Prop({ required: true })
   quantity: number;
 
-  @Prop({ required: false })
+  @Prop({ type: Object })
   metadata?: any;
 
   @Prop({ required: true })
   cost: number;     // Pre-calculated cost based on pricing
 }
 
-export const UsageRecordSchema = SchemaFactory.createForClass(UsageRecord);
+export const UsageSchema = SchemaFactory.createForClass(Usage);

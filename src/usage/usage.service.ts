@@ -1,23 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
-import { UsageRecord } from 'src/usage/entities/usage.entity';
+import { Usage } from 'src/usage/entities/usage.entity';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
 
 @Injectable()
 export class UsageService {
   private readonly pricing = {
     openai: {
-      input_tokens: 0.000200,    // per 1K tokens
-      output_tokens: 0.000800,    // per 1K tokens
-      embedding_tokens: 0.000150,    // per 1K tokens
-      realtime_minutes: 0.0015 // per minute
+      input_tokens: 0.000200,
+      output_tokens: 0.000800,
+      embedding_tokens: 0.000150,
+      realtime_minutes: 0.0015
+    },
+		openai_realtime: {
+      input_tokens: 0.1000,
+      output_tokens: 0.2000,
     },
     elevenlabs: {
-      characters: 0.00003      // per character
+      characters: 0.00003
     },
     deepgram: {
-      minutes: 0.0059          // per minute
+      minutes: 0.0059
     },
     twilio: {
       inbound_minutes: 0.0085,
@@ -30,7 +34,7 @@ export class UsageService {
   };
 
   constructor(
-    @InjectModel(UsageRecord.name) private usageModel: Model<UsageRecord>
+    @InjectModel(Usage.name) private usageModel: Model<Usage>
   ) {}
 
   private calculateCost(service: string, type: string, quantity: number): number {
@@ -48,17 +52,19 @@ export class UsageService {
     quantity: number,
     metadata?: any
   ) {
-    const cost = this.calculateCost(service, type, quantity);
-    const record = new this.usageModel({
-      organization: organizationId,
-      timestamp: new Date(),
-      service,
-      type,
-      quantity,
-      cost,
-      metadata
-    });
-    await record.save();
+		try {
+			const cost = this.calculateCost(service, type, quantity);
+			const record = new this.usageModel({
+				organization: organizationId,
+				timestamp: new Date(),
+				service,
+				type,
+				quantity,
+				cost,
+				metadata
+			});
+			await record.save();
+		} catch (err) { console.log(err); }
   }
 
   async getUsageByTimeRange(

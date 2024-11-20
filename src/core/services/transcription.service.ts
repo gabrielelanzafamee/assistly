@@ -124,26 +124,23 @@ export class TranscriptionService {
 			this.dgConnection.on(LiveTranscriptionEvents.Metadata, (metadata) => {
 				console.log('STT -> deepgram metadata');
 				console.log(JSON.stringify(metadata));
+				if (organizationId) {
+					this.usageService.recordUsage(
+						organizationId,
+						'deepgram',
+						'minutes',
+						(metadata.duration / 60)
+					).then(() => {
+						console.log('STT -> Deepgram usage recorded');
+					}).catch((error) => {
+						console.error('STT -> Error recording Deepgram usage', error);
+					});
+				}
 			});
 
 			this.dgConnection.on(LiveTranscriptionEvents.Close, (metadata) => {
 				console.log('STT -> deepgram close');
 				console.log(JSON.stringify(metadata));
-				// const data = JSON.parse(message);
-				// console.log('STT -> Deepgram connection closed');
-				// clearInterval(trackInterval);
-				// if (organizationId) {
-				// 	this.usageService.recordUsage(
-				// 		organizationId,
-				// 		'deepgram',
-				// 		'audio_seconds',
-				// 		(data.duration / 60)
-				// 	).then(() => {
-				// 		console.log('STT -> Deepgram usage recorded');
-				// 	}).catch((error) => {
-				// 		console.error('STT -> Error recording Deepgram usage', error);
-				// 	});
-				// }
 			});
 		});
 	}

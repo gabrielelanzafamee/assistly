@@ -11,6 +11,7 @@ import { WebsocketsOpenAIGateway } from './gateways/websockets-openai.gateway';
 import { WebsocketsOpenaiService } from './services/websockets-openai.service';
 import { OpenAIModule } from 'src/core/openai/openai.module';
 import { ConfigModule } from 'src/core/config/config.module';
+import { UsageModule } from 'src/usage/usage.module';
 
 @Module({
 	imports: [
@@ -18,7 +19,8 @@ import { ConfigModule } from 'src/core/config/config.module';
 		CallsModule,
 		KnowledgesModule,
 		OpenAIModule,
-		ConfigModule
+		ConfigModule,
+		UsageModule
 	],
   providers: [
 		WebsocketsCustomGateway,

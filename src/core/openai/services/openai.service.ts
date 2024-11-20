@@ -18,7 +18,6 @@ import { ToolRegistryService } from './tool-registry.service';
 import { Stream } from 'openai/streaming';
 import { ChatCompletionChunk } from 'openai/resources';
 import { UsageService } from '../../../usage/usage.service';
-import { APIPromise } from 'openai/core';
 
 
 // integrate here usage save infomation

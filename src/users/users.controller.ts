@@ -1,4 +1,4 @@
-import { Body, Get, Param, Post, Req } from '@nestjs/common';
+import { Body, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common';
 import { ApiController } from 'src/core/decorators/api.decorator';
 import { IRequest } from 'src/core/interfaces/request.interface';
 import { successResponse } from 'src/core/utils/responses.util';
@@ -21,25 +21,29 @@ export class UsersController {
 	}
 
 	@Get()
+	@Authenticated()
 	async list(@Req() req: IRequest) {
 		const results = await this.usersService.list(req.organization._id.toString());
 		return successResponse(results, 'Users list retrieved successfully')
 	}
 
 	@Get(':id')
+	@Authenticated()
 	async single(@Req() req: IRequest, @Param('id') id: string) {
 		const result = await this.usersService.get(id, req.organization._id.toString());
 		return successResponse(result, 'User retrieved successfully')
 	}
 
 
-	@Get(':id')
+	@Patch(':id')
+	@Authenticated()
 	async update(@Req() req: IRequest, @Param('id') id: string, @Body() body: UpdateUserDto) {
 		const result = await this.usersService.update(id, req.organization._id.toString(), body);
 		return successResponse(result, 'User updated successfully')
 	}
 
-	@Get(':id')
+	@Delete(':id')
+	@Authenticated()
 	async delete(@Req() req: IRequest, @Param('id') id: string) {
 		const result = await this.usersService.delete(id, req.organization._id.toString());
 		return successResponse(result, 'User deleted successfully')

@@ -1,0 +1,16 @@
+<app-shared-button (click)="this.openCreateModal($event)" label="Create"></app-shared-button>
+
+<app-modal #createUserModal>
+  <div modal-title>Create a new user</div>
+</app-modal>
+
+<app-modal #editUserModal>
+  <div modal-title>Edit User</div>
+</app-modal>
+
+<div class="table-wrapper mt-5">
+  <app-shared-table
+  [columns]="columns"
+  [dataSource]="data"
+  ></app-shared-table>
+</div>

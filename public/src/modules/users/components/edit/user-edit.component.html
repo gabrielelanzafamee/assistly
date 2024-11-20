@@ -1,0 +1,32 @@
+<div class="form-contrainer w-full h-full flex justify-center items-center">
+  <form (ngSubmit)="onSubmit($event)" [formGroup]="userForm" class="form one-column w-full">
+
+    <div class="flex flex-row space-x-2 mb-4">
+      <div class="w-6/12">
+        <app-shared-input [control]="this.getControl('firstName')" class="block" formControlName="firstName" id="firstName" type="text" label="First name"></app-shared-input>
+      </div>
+      <div class="w-6/12">
+        <app-shared-input [control]="this.getControl('lastName')" class="block" formControlName="lastName" id="lastName" type="text" label="Last name"></app-shared-input>
+      </div>
+    </div>
+
+    <div class="flex flex-row space-x-2 mb-4">
+      <div class="w-6/12">
+        <app-shared-input [control]="this.getControl('email')" class="block" formControlName="email" id="email" type="email" label="Email"></app-shared-input>
+      </div>
+      <div class="w-6/12">
+        <app-shared-input [control]="this.getControl('password')" class="block" formControlName="password" id="password" type="password" label="Password"></app-shared-input>
+      </div>
+    </div>
+
+    <div class="flex flex-row space-x-2 mb-4">
+      <div class="w-6/12 w-full">
+        <app-shared-select [control]="this.getControl('role')" [options]="roles" formControlName="role" id="role"></app-shared-select>
+      </div>
+      <div class="w-6/12 w-full">
+        <app-shared-switch [control]="this.getControl('isActive')" formControlName="isActive" id="isActive" label="Is Active?"></app-shared-switch>
+      </div>
+    </div>
+    <app-shared-button class="mt-5 block" type="submit" label="Confirm" [disabled]="!userForm.valid" />
+  </form>
+</div>

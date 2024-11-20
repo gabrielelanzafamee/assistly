@@ -60,7 +60,7 @@ export class MessagesService {
 			body: text,
 			to: to,
 			from: conversation.type === ConversationType.WHATSAPP ? `whatsapp:${phone.phoneNumber}` : phone.phoneNumber
-		});
+		}, phone.organization._id.toString());
 
 		const messageObject = {
 			organization: organizationId,
@@ -104,7 +104,7 @@ export class MessagesService {
 			body: body.content,
 			to: twilioTo,
 			from: twilioFrom
-		});
+		}, organizationId);
 
 		const messageObject = {
 			organization: organizationId,
