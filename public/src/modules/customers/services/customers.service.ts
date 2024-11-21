@@ -7,14 +7,15 @@ import { ICustomerDeleteResponse, ICustomerItem, ICustomerListResponse, ICustome
 export class CustomersService {
   constructor(private apiService: ApiService) {}
 
-  public fetchCustomers(): Observable<ICustomerListResponse> {
-    return this.apiService.get<ICustomerListResponse>('customers').pipe(
+  public fetchCustomers(limit = 12, offset = 0): Observable<ICustomerListResponse> {
+    return this.apiService.get<ICustomerListResponse>(`customers?limit=${limit}&offset=${offset}`).pipe(
       catchError((err) => {
         console.error('Error fetching Conversations:', err);
         return of({
           ok: false,
           message: 'Failed to fetch Conversations',
-          results: []
+          results: [],
+          count: 0
         });
       })
     );

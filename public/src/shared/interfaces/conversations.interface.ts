@@ -33,6 +33,7 @@ export interface IConversationUpdateRequest {
 
 export interface IConversationListResponse extends IResponseBase {
   results: IConversationItem[];
+  count: number;
 }
 
 export interface IConversationSingleResponse extends IResponseBase {

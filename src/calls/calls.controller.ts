@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query } from '@nestjs/common';
 import { CallsService } from './calls.service';
 import { CreateCallDto } from './dto/create-call.dto';
 import { UpdateCallDto } from './dto/update-call.dto';
@@ -22,14 +22,15 @@ export class CallsController {
 
   @Get()
 	@Authenticated()
-  async single(@Req() req: IRequest) {
-    const result = await this.callsService.list(req.organization._id.toString());
-		return successResponse(result, 'success');
+  async list(@Req() req: IRequest, @Query('limit') limit: number = 12, @Query('offset') offset: number = 0) {
+		const result = await this.callsService.list(req.organization._id.toString(), { limit, offset });
+		const count = await this.callsService.count(req.organization._id.toString());
+		return successResponse(result, 'success', { count });
   }
 
   @Get(':id')
 	@Authenticated()
-  async list(@Req() req: IRequest, @Param('id') id: string) {
+  async get(@Req() req: IRequest, @Param('id') id: string) {
     const result = await this.callsService.get(id, req.organization._id.toString());
 		return successResponse(result, 'success');
   }

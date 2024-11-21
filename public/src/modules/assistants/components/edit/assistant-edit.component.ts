@@ -18,7 +18,7 @@ import { IKnowledgeListResponse } from '../../../../shared/interfaces/knowledges
 @Component({
   selector: 'app-assistant-edit',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonComponent, ModalComponent, InputComponent, SelectComponent, TextAreaComponent, SwitchComponent],
+  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, SelectComponent, TextAreaComponent, SwitchComponent],
   providers: [HttpClient],
   templateUrl: './assistant-edit.component.html',
   styleUrl: './assistant-edit.component.scss'

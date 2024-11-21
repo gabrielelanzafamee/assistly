@@ -27,15 +27,15 @@ export class PhonesService {
     });
   }
 
-  public fetchPhones(): Observable<IPhonesListResponse> {
-    return this.apiService.get<IPhonesListResponse>('phones').pipe(
+  public fetchPhones(limit = 12, offset = 0): Observable<IPhonesListResponse> {
+    return this.apiService.get<IPhonesListResponse>(`phones?limit=${limit}&offset=${offset}`).pipe(
       catchError((err) => {
-        console.error('Error fetching phones:', err);
-        // Handle error by returning an empty response
+        console.error('Error fetching calls:', err);
         return of({
-          ok: false,  // Assuming 'ok' is a boolean
-          message: 'Failed to fetch phones',
-          results: []
+          ok: false,
+          message: 'Failed to fetch calls',
+          results: [],
+          count: 0
         });
       })
     );

@@ -1,9 +1,5 @@
 import * as twilio from 'twilio';
-import {
-	ForbiddenException,
-	Injectable,
-	InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { AssistantType } from 'src/core/enums/assistant.enum';
 import { CallStatus } from 'src/core/enums/call.enum';
 import {
@@ -12,30 +8,44 @@ import {
 } from 'src/core/interfaces/twilio.interface';
 import { assertion } from 'src/core/utils/common.util';
 import { WebhooksCommonService } from './webhooks-common.service';
+import { plansLimitations } from 'src/core/config/organization.config';
+import { CallQueueService } from 'src/core/services/call-queue.service';
 
 @Injectable()
 export class WebhooksCallsService {
 	constructor(
-		private readonly webhooksCommonService: WebhooksCommonService
+		private readonly webhooksCommonService: WebhooksCommonService,
+		private readonly callQueueService: CallQueueService,
 	) {}
 
 	async callbackCall(params: ITwilioVoiceCallback, phoneId: string) {
 		const response = new twilio.twiml.VoiceResponse();
-		const { phone, assistant } = await this.webhooksCommonService.getAssistantAndPhone(
-			phoneId,
-			AssistantType.CALL,
-		);
+		const { phone, assistant } =
+			await this.webhooksCommonService.getAssistantAndPhone(
+				phoneId,
+				AssistantType.CALL,
+			);
 
 		// check how many calls and rmeove them
-		const calls = await this.webhooksCommonService.callsService.getCallsByStatus(
-			params.From,
-			phone.organization._id.toString(),
-			CallStatus.IN_PROGRESS,
-		);
-		assertion(calls < 5, new ForbiddenException('Calls full at the moment.'));
+		const calls =
+			await this.webhooksCommonService.callsService.getCallsByStatus(
+				phone.organization._id.toString(),
+				CallStatus.IN_PROGRESS,
+			);
 
-		if (calls >= 5) {
-			response.say('The line is busy at the moment, try later.');
+		if (calls >= plansLimitations[phone.organization.plan].calls) {
+			// Add call to the queue
+			this.callQueueService.enqueueCall(phone.organization._id.toString(), {
+				phoneId: phone._id.toString(),
+				callSid: params.CallSid,
+				from: params.From,
+				to: params.To
+			});
+
+			// Inform the caller they are in a queue
+			response.say(
+				`The line is currently busy. You are placed in a queue. We will connect you as soon as possible.`,
+			);
 			return response.toString();
 		}
 

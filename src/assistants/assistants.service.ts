@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Assistant, AssistantDocument } from './entities/assistant.entity';
@@ -7,6 +7,7 @@ import { OrganizationsService } from 'src/organizations/organizations.service';
 import { CreateAssistantDto } from './dto/create-assistant.dto';
 import { assertion } from 'src/core/utils/common.util';
 import { UpdateAssistantDto } from './dto/update-assistant.dto';
+import { plansLimitations } from 'src/core/config/organization.config';
 
 @Injectable()
 export class AssistantsService {
@@ -23,6 +24,9 @@ export class AssistantsService {
 		
 		const phone = await this.phonesService.get(data.numberId, organizationId);
 		assertion(phone, new BadRequestException('Number not found'));
+
+		const assistants = await this.list(organizationId);
+		assertion(assistants.length < plansLimitations[organization.plan].assistants, new ForbiddenException("Limit reached"));
 
 		const assistant = new this.assistantModel({
 			name: data.name,

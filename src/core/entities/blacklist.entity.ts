@@ -1,32 +1,34 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { OrganizationDocument } from 'src/organizations/entities/organization.entity';
-import { KnowledgeChunk } from 'src/core/interfaces/knowledges.interface';
 
-export type KnowledgeDocument = HydratedDocument<Knowledge>;
+export type BlacklistDocument = HydratedDocument<Blacklist>;
 
 @Schema()
-export class Knowledge {
+export class Blacklist {
 	@Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Organization' })
 	organization: OrganizationDocument;
 
-	@Prop({})
-	name: string;
-	@Prop({ default: [] })
-	chunks: KnowledgeChunk[];
-
 	@Prop()
-	totalSize: number;
-
+	phoneNumber: string;
+	@Prop()
+	reason: string;
+	@Prop({ type: Date })
+	blockedAt: Date;
+	@Prop()
+	count: number;
+	@Prop({ type: Date })
+  windowStart?: Date;
+	
 	@Prop({ type: Date })
 	createdAt: Date;
 	@Prop({ type: Date })
 	updatedAt: Date;
 }
 
-export const KnowledgeSchema = SchemaFactory.createForClass(Knowledge);
+export const BlacklistSchema = SchemaFactory.createForClass(Blacklist);
 
-KnowledgeSchema.pre('save', function (next) {
+BlacklistSchema.pre('save', function (next) {
 	const now = new Date();
 
   this.updatedAt = now;

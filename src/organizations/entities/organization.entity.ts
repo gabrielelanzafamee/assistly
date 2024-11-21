@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { OrganizationPlans } from 'src/core/enums/organization.enum';
 
 export type OrganizationDocument = HydratedDocument<Organization>;
 
@@ -25,7 +26,10 @@ export class Organization {
 	phoneNumber: string;
 	@Prop({ unique: true })
 	email: string;
-  
+
+	@Prop({})
+	plan: OrganizationPlans;
+
 	@Prop({})
 	isActive: boolean;
 

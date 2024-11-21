@@ -1,4 +1,4 @@
-import { Get, Param, Delete, Req } from '@nestjs/common';
+import { Get, Param, Delete, Req, Query } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { ApiController } from 'src/core/decorators/api.decorator';
 import { ApiTags } from '@nestjs/swagger';
@@ -11,12 +11,13 @@ import { successResponse } from 'src/core/utils/responses.util';
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
-	@Get()
+  @Get()
 	@Authenticated()
-	async list(@Req() req: IRequest) {
-		const result = await this.customersService.list(req.organization._id.toString());
-		return successResponse(result, 'List customers fetched');
-	}
+  async list(@Req() req: IRequest, @Query('limit') limit: number = 12, @Query('offset') offset: number = 0) {
+		const result = await this.customersService.list(req.organization._id.toString(), { limit, offset });
+		const count = await this.customersService.count(req.organization._id.toString());
+		return successResponse(result, 'success', { count });
+  }
 
 	@Get(':id')
 	@Authenticated()

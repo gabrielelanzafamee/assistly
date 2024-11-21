@@ -23,12 +23,13 @@ export class PhonesController {
 		return successResponse(results, 'Phone number created successfully');
 	}
 
-	@Get()
+  @Get()
 	@Authenticated()
-	async getPhoneNumbers(@Req() req: IRequest) {
-		const results = await this.phonesService.list(req.organization._id.toString());
-		return successResponse(results, 'Phone numbers retrieved successfully');
-	}
+  async list(@Req() req: IRequest, @Query('limit') limit: number = 12, @Query('offset') offset: number = 0) {
+		const result = await this.phonesService.list(req.organization._id.toString(), { limit, offset });
+		const count = await this.phonesService.count(req.organization._id.toString());
+		return successResponse(result, 'success', { count });
+  }
 
 	@Get(':id')
 	@Authenticated()

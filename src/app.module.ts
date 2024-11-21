@@ -18,6 +18,10 @@ import { ConfigService } from './core/config/config.service';
 import { ToolsModule } from './tools/tools.module';
 import { CustomersModule } from './customers/customers.module';
 import { UsageModule } from './usage/usage.module';
+import { QueueScheduler } from './core/pipes/queue.scheduler';
+import { QueueProcessorService } from './core/services/queue-processor.service';
+import { CallQueueService } from './core/services/call-queue.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 const configService = new ConfigService();
 const config = configService.getSystemConfig();
@@ -26,6 +30,7 @@ const config = configService.getSystemConfig();
   imports: [
 		MongooseModule.forRoot(config.mongoUri),
 		EventEmitterModule.forRoot(),
+		ScheduleModule.forRoot(),
 		OrganizationsModule,
 		UsersModule,
 		AuthModule,
@@ -43,7 +48,7 @@ const config = configService.getSystemConfig();
 		UsageModule
 	],
   controllers: [],
-  providers: [],
+  providers: [QueueProcessorService, CallQueueService, QueueScheduler],
 	exports: []
 })
 export class AppModule {}

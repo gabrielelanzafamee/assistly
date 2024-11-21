@@ -47,6 +47,7 @@ export interface ICallUpdateRequest {
 
 export interface ICallListResponse extends IResponseBase {
   results: ICallItem[];
+  count: number;
 }
 
 export interface ICallSingleResponse extends IResponseBase {

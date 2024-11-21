@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsEmail, IsIn, IsNotEmpty, IsOptional, IsPhoneNumber, MaxLength } from 'class-validator';
+import { OrganizationPlans } from 'src/core/enums/organization.enum';
 import { COUNTRY_INFO } from 'src/core/enums/countryCode.enum';
 
 export class CreateOrganizationDto {
@@ -34,6 +35,10 @@ export class CreateOrganizationDto {
 	@MaxLength(50)
 	@ApiProperty()
 	city: string;
+
+	@IsIn(Object.keys(OrganizationPlans).map(k => OrganizationPlans[k]))
+	@ApiProperty()
+	plan: string;
 
 	@IsNotEmpty()
 	@MaxLength(50)

@@ -19,10 +19,17 @@ import { WebhooksSmsService } from './services/webhooks-sms.service';
 import { WebhooksWhatsappService } from './services/webhooks-whatsapp.service';
 import { WebhooksCommonService } from './services/webhooks-common.service';
 import { CustomersModule } from 'src/customers/customers.module';
+import { BlacklistService } from 'src/core/services/blacklist.service';
+import { Blacklist, BlacklistSchema } from 'src/core/entities/blacklist.entity';
+import { CallQueue, CallQueueSchema } from 'src/core/entities/queue-call.entity';
+import { CallQueueService } from 'src/core/services/call-queue.service';
+import { QueueScheduler } from 'rxjs/internal/scheduler/QueueScheduler';
 
 
 @Module({
   imports: [
+		MongooseModule.forFeature([{ name: Blacklist.name, schema: BlacklistSchema }]),
+		MongooseModule.forFeature([{ name: CallQueue.name, schema: CallQueueSchema }]),
 		MongooseModule,
 		UsersModule,
 		AssistantsModule,
@@ -44,7 +51,10 @@ import { CustomersModule } from 'src/customers/customers.module';
 		WebhooksCallsService,
 		WebhooksSmsService,
 		WebhooksWhatsappService,
-		WebhooksCommonService	
+		WebhooksCommonService,
+		BlacklistService,
+		CallQueueService,
+		QueueScheduler
 	],
   exports: [MongooseModule, WebhooksService]
 })

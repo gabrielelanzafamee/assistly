@@ -8,6 +8,7 @@ import { Knowledge, KnowledgeDocument } from './entities/knowledge.entity';
 import { CreateKnowledgeDto } from './dto/create-knowledge.dto';
 import { OrganizationsService } from 'src/organizations/organizations.service';
 import { OpenAIService } from 'src/core/openai/services/openai.service';
+import { plansLimitations } from 'src/core/config/organization.config';
 
 @Injectable()
 export class KnowledgesService {
@@ -25,6 +26,13 @@ export class KnowledgesService {
 		// check if organizationId already exist
 		const organization = await this.organizationsService.get(organizationId);
 		assertion(organization, new BadRequestException('Organization not found'));
+
+		// get total size file
+		const knowledges = await this.list(organizationId);
+		const uploadedMb = knowledges.reduce((total, item) => total + item.totalSize, 0);
+		const filesMb = files.reduce((total, item) => total + (item.size * 1024 * 1024), 0);
+		const totalMb = filesMb + uploadedMb;
+		assertion(totalMb < plansLimitations[organization.plan].knowledgeMB, new BadRequestException('Total knowledge size exceeds plan limit'));
 
 		const chunks = (
 			await Promise.all(

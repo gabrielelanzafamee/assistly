@@ -140,6 +140,14 @@ export class TwilioService {
 		}
 	}
 
+	async startCall(from: string, to: string, callbackUrl: string) {
+    return await this.client.calls.create({
+      from: from,
+      to: to,
+      url: callbackUrl
+    });
+  }
+
 	isE164(number: string) {
 		const regex = new RegExp(/^\+[1-9]\d{1,14}$/);
 		return regex.test(number);

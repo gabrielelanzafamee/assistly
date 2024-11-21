@@ -8,3 +8,40 @@
   [dataSource]="data"
   ></app-shared-table>
 </div>
+
+<div class="flex items-center justify-start space-x-4 mt-5">
+  <!-- Previous Button -->
+  <button
+    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+    (click)="previousPage()"
+    [disabled]="currentPage === 1"
+  >
+    Previous
+  </button>
+
+  <!-- Page Numbers -->
+  <div class="flex space-x-2">
+    <button
+      *ngFor="let page of pages"
+      (click)="goToPage(page)"
+      class="px-4 py-2 text-sm font-medium border rounded transition-colors"
+      [class.bg-black]="currentPage === page"
+      [class.text-white]="currentPage === page"
+      [class.text-gray-700]="currentPage !== page"
+      [class.bg-white]="currentPage !== page"
+      [class.border-gray-300]="currentPage !== page"
+      [class.hover:bg-gray-100]="currentPage !== page"
+    >
+      {{ page }}
+    </button>
+  </div>
+
+  <!-- Next Button -->
+  <button
+    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+    (click)="nextPage()"
+    [disabled]="currentPage === totalPages"
+  >
+    Next
+  </button>
+</div>

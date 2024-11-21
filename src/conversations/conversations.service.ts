@@ -13,8 +13,15 @@ export class ConversationsService {
 		@InjectModel(Conversation.name) private conversationModel: Model<Conversation>,
 	) {}
 
-	async list(organizationId): Promise<ConversationDocument[]> {
+	async list(organizationId: string, pagination = null) {
+		if (pagination !== null) {
+			return await this.conversationModel.find({ organization: organizationId }).skip(pagination.offset).limit(pagination.limit).populate(['organization', 'assistant', 'phone']);
+		}
 		return await this.conversationModel.find({ organization: organizationId }).populate(['organization', 'assistant', 'phone']);
+  }
+
+	async count(organizationId: string) {
+		return await this.conversationModel.countDocuments({ organization: organizationId });
 	}
 
 	async create(conversation: CreateConversationDto): Promise<ConversationDocument> {

@@ -1,10 +1,12 @@
-import { Body, Post, UnauthorizedException } from '@nestjs/common';
+import { Body, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiController } from 'src/core/decorators/api.decorator';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login-auth.dto';
 import { successResponse } from 'src/core/utils/responses.util';
 import { SignUpDto } from './dto/signup-auth.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { Authenticated, Roles } from 'src/core/decorators/auth.decorator';
+import { UserRoles } from 'src/core/enums/user.enum';
 
 
 @ApiController('auth')
@@ -27,6 +29,8 @@ export class AuthController {
   }
 
 	@Post('signup')
+	@Authenticated()
+	@Roles(UserRoles.SUPER_ADMIN)
 	async signup(@Body() body: SignUpDto) {
 		const result = await this.authService.signup(body);
 		return successResponse(result);

@@ -16,9 +16,17 @@ export class CustomersService {
     return this.customerModel.findOne({ email });
   }
 
-	async list(organization: string): Promise<CustomerDocument[]> {
-		return this.customerModel.find({ organization });
+  async list(organizationId: string, pagination = null) {
+		if (pagination !== null) {
+			return await this.customerModel.find({ organization: organizationId }).skip(pagination.offset).limit(pagination.limit);
+		}
+		return await this.customerModel.find({ organization: organizationId });
+  }
+
+	async count(organizationId: string) {
+		return await this.customerModel.countDocuments({ organization: organizationId });
 	}
+
 
 	async create(customer: CreateCustomerDto): Promise<CustomerDocument> {
 		return await new this.customerModel(customer).save();

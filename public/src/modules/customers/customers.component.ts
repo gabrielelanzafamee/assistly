@@ -1,17 +1,17 @@
 import { Component, ComponentRef, OnInit, ViewChild } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { TableComponent } from "../../shared/ui-components/table/table.component";
-import { ButtonComponent } from "../../shared/ui-components/button/button.component";
 import { ModalComponent } from '../../shared/ui-components/modal/modal.component';
 import { IAssistantItem } from '../../shared/interfaces/assistants.interface';
 import { CustomersService } from './services/customers.service';
 import { ICustomerItem } from '../../shared/interfaces/customers.interface';
 import { CustomersSingleComponent } from './components/customers-single/customers-single.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-customers',
   standalone: true,
-  imports: [TableComponent, ButtonComponent, ModalComponent],
+  imports: [CommonModule, TableComponent, ModalComponent],
   templateUrl: './customers.component.html',
   styleUrls: ['./customers.component.scss'],
 })
@@ -22,6 +22,13 @@ export class CustomersComponent implements OnInit {
   public columns: any = [];
   public data: any[] = [];
 
+  public currentPage: number = 1;
+  public itemsPerPage: number = 12;
+  public totalPages: number = 0;
+
+  public pages: number[] = []; // Array for page numbers
+
+
   constructor(
     private customersService: CustomersService,
   ) {}
@@ -31,7 +38,16 @@ export class CustomersComponent implements OnInit {
   }
 
   public async loadData() {
-    const customers = (await firstValueFrom(this.customersService.fetchCustomers())).results;
+    const offset = (this.currentPage - 1) * this.itemsPerPage; // Calculate offset
+    const response = await firstValueFrom(
+      this.customersService.fetchCustomers(this.itemsPerPage, offset)
+    );
+
+    const { results: customers, count } = response;
+
+    this.data = customers;
+    this.totalPages = Math.ceil(count / this.itemsPerPage); // Calculate total pages
+    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1); // Generate page numbers
 
     this.columns = [
       {
@@ -50,8 +66,25 @@ export class CustomersComponent implements OnInit {
       { key: 'createdAt', label: 'Created At', type: 'text' },
       { key: 'updatedAt', label: 'Updated At', type: 'text' }
     ];
+  }
 
-    this.data = customers;
+  public nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadData(); // Load the next page
+    }
+  }
+
+  public previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadData(); // Load the previous page
+    }
+  }
+
+  public goToPage(page: number) {
+    this.currentPage = page;
+    this.loadData();
   }
 
   async handleDelete(event: Event, id: string) {

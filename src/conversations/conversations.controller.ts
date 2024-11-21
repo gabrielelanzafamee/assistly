@@ -1,7 +1,7 @@
 import { ConversationsService } from './conversations.service';
 import { ApiController } from 'src/core/decorators/api.decorator';
 import { ApiTags } from '@nestjs/swagger';
-import { Body, Delete, Get, Param, Patch, Post, Req } from '@nestjs/common';
+import { Body, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common';
 import { Authenticated } from 'src/core/decorators/auth.decorator';
 import { IRequest } from 'src/core/interfaces/request.interface';
 import { CreateConversationDto } from './dto/create-conversation.dto';
@@ -13,12 +13,13 @@ import { successResponse } from 'src/core/utils/responses.util';
 export class ConversationsController {
   constructor(private readonly conversationsService: ConversationsService) {}
 
-	@Get()
+  @Get()
 	@Authenticated()
-	async list(@Req() req: IRequest) {
-		const result = await this.conversationsService.list(req.organization._id.toString());
-		return successResponse(result, 'success');
-	}
+  async list(@Req() req: IRequest, @Query('limit') limit: number = 12, @Query('offset') offset: number = 0) {
+		const result = await this.conversationsService.list(req.organization._id.toString(), { limit, offset });
+		const count = await this.conversationsService.count(req.organization._id.toString());
+		return successResponse(result, 'success', { count });
+  }
 	
 	@Post()
 	@Authenticated()

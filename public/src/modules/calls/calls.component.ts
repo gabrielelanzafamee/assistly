@@ -5,14 +5,14 @@ import { ButtonComponent } from "../../shared/ui-components/button/button.compon
 import { ModalComponent } from '../../shared/ui-components/modal/modal.component';
 import { IAssistantItem } from '../../shared/interfaces/assistants.interface';
 import { CallsService } from './services/calls.service';
-import { IConversationItem } from '../../shared/interfaces/conversations.interface';
 import { ICallItem } from '../../shared/interfaces/calls.interface';
 import { CallsSingleComponent } from './components/calls-single/calls-single.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-calls',
   standalone: true,
-  imports: [TableComponent, ButtonComponent, ModalComponent],
+  imports: [CommonModule, TableComponent, ModalComponent],
   templateUrl: './calls.component.html',
   styleUrls: ['./calls.component.scss'],
 })
@@ -23,6 +23,12 @@ export class CallsComponent implements OnInit {
   public columns: any = [];
   public data: any[] = [];
 
+  public currentPage: number = 1;
+  public itemsPerPage: number = 12;
+  public totalPages: number = 0;
+
+  public pages: number[] = []; // Array for page numbers
+
   constructor(
     private callsService: CallsService,
   ) {}
@@ -32,9 +38,16 @@ export class CallsComponent implements OnInit {
   }
 
   public async loadData() {
-    const calls = (await firstValueFrom(this.callsService.fetchCalls())).results;
+    const offset = (this.currentPage - 1) * this.itemsPerPage; // Calculate offset
+    const response = await firstValueFrom(
+      this.callsService.fetchCalls(this.itemsPerPage, offset)
+    );
 
-    console.log(calls);
+    const { results: calls, count } = response;
+
+    this.data = calls.map(item => ({ ...item, assistant: item.assistant.name }));
+    this.totalPages = Math.ceil(count / this.itemsPerPage); // Calculate total pages
+    this.pages = Array.from({ length: this.totalPages }, (_, i) => i + 1); // Generate page numbers
 
     this.columns = [
       {
@@ -53,8 +66,25 @@ export class CallsComponent implements OnInit {
       { key: 'createdAt', label: 'Created At', type: 'text' },
       { key: 'updatedAt', label: 'Updated At', type: 'text' },
     ];
+  }
 
-    this.data = calls;
+  public nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadData(); // Load the next page
+    }
+  }
+
+  public previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadData(); // Load the previous page
+    }
+  }
+
+  public goToPage(page: number) {
+    this.currentPage = page;
+    this.loadData();
   }
 
   async handleDelete(event: Event, id: string) {

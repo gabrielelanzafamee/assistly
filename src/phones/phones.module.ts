@@ -7,12 +7,14 @@ import { Phone, PhoneSchema } from './entities/phone.entity';
 import { ConfigService } from 'src/core/config/config.service';
 import { ConfigModule } from 'src/core/config/config.module';
 import { UsageModule } from 'src/usage/usage.module';
+import { OrganizationsModule } from 'src/organizations/organizations.module';
 
 @Module({
   imports: [
 		MongooseModule.forFeature([{ name: Phone.name, schema: PhoneSchema }]),
 		ConfigModule,
-		UsageModule
+		UsageModule,
+		OrganizationsModule
 	],
   controllers: [PhonesController],
   providers: [PhonesService, TwilioService],

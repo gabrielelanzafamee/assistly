@@ -13,7 +13,7 @@ import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-phone-create',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonComponent, ModalComponent, InputComponent, SelectComponent],
+  imports: [ReactiveFormsModule, ButtonComponent, InputComponent, SelectComponent],
   providers: [HttpClient],
   templateUrl: './phone-create.component.html',
   styleUrl: './phone-create.component.scss'

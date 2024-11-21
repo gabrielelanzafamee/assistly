@@ -11,7 +11,7 @@ import { CallsService } from '../../services/calls.service';
 @Component({
   selector: 'app-calls-single',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonComponent, CommonModule, ModalComponent, InputComponent],
+  imports: [ReactiveFormsModule, ButtonComponent, CommonModule, InputComponent],
   providers: [HttpClient],
   templateUrl: './calls-single.component.html',
   styleUrl: './calls-single.component.scss'

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { TwilioService } from '../core/services/twilio.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -8,6 +8,8 @@ import { IncomingPhoneNumberInstance } from 'twilio/lib/rest/api/v2010/account/i
 import { Phone } from './entities/phone.entity';
 import { CreatePhoneDto } from './dto/create-phone.dto';
 import { ConfigService } from 'src/core/config/config.service';
+import { plansLimitations } from 'src/core/config/organization.config';
+import { OrganizationsService } from 'src/organizations/organizations.service';
 
 // structure to build the base URL for the callback of twilio
 // {{BaseUrl}}/api/v1/webhook/phone/{_id}/callbackSms
@@ -22,6 +24,7 @@ export class PhonesService {
 
 	constructor(
 		@InjectModel(Phone.name) private readonly phoneModel: Model<Phone>,
+		private readonly organizationsService: OrganizationsService,
 		private readonly twilioService: TwilioService,
 		private readonly configService: ConfigService
 	) {
@@ -41,11 +44,25 @@ export class PhonesService {
 		return await this.phoneModel.findOne({ accountSid, phoneNumber }).populate(['organization']);
 	}
 
-	async list(organizationId: string) {
+	async list(organizationId: string, pagination = null) {
+		if (pagination !== null) {
+			return await this.phoneModel.find({ organization: organizationId }).skip(pagination.offset).limit(pagination.limit);
+		}
 		return await this.phoneModel.find({ organization: organizationId });
+  }
+
+	async count(organizationId: string) {
+		return await this.phoneModel.countDocuments({ organization: organizationId });
 	}
 
 	async createPhoneNumber(data: CreatePhoneDto, organizationId: string) {
+		// check if organizationId already exist
+		const organization = await this.organizationsService.get(organizationId);
+		assertion(organization, new BadRequestException('Organization not found'));
+		
+		const phones = await this.list(organizationId);
+		assertion(phones.length < plansLimitations[organization.plan].phones, new ForbiddenException("Limit reached"));
+
 		const phoneDB = new this.phoneModel({
 			friendlyName: data.friendlyName,
 			phoneNumber: data.phoneNumber,

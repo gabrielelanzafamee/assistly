@@ -7,14 +7,15 @@ import { ICallCreateRequest, ICallCreateResponse, ICallDeleteResponse, ICallItem
 export class CallsService {
   constructor(private apiService: ApiService) {}
 
-  public fetchCalls(): Observable<ICallListResponse> {
-    return this.apiService.get<ICallListResponse>('calls').pipe(
+  public fetchCalls(limit = 12, offset = 0): Observable<ICallListResponse> {
+    return this.apiService.get<ICallListResponse>(`calls?limit=${limit}&offset=${offset}`).pipe(
       catchError((err) => {
         console.error('Error fetching calls:', err);
         return of({
           ok: false,
           message: 'Failed to fetch calls',
-          results: []
+          results: [],
+          count: 0
         });
       })
     );

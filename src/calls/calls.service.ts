@@ -16,9 +16,16 @@ export class CallsService {
 		return await new this.callModel(createCallDto).save();
   }
 
-  async list(organizationId: string ) {
+  async list(organizationId: string, pagination = null) {
+		if (pagination !== null) {
+			return await this.callModel.find({ organization: organizationId }).skip(pagination.offset).limit(pagination.limit).populate(['organization', 'assistant', 'phone'])
+		}
 		return await this.callModel.find({ organization: organizationId }).populate(['organization', 'assistant', 'phone'])
   }
+
+	async count(organizationId: string) {
+		return await this.callModel.countDocuments({ organization: organizationId });
+	}
 
 	async get(id: string, organizationId: string) {
 		return (await this.callModel.findOne({ _id: id, organization: organizationId })).populate(['organization', 'assistant', 'phone'])
@@ -44,9 +51,9 @@ export class CallsService {
 			.populate(['phone', 'organization', 'assistant']);
 	}
 
-	async getCallsByStatus(from: string, organization: string, status: CallStatus): Promise<number> {
+	async getCallsByStatus(organization: string, status: CallStatus): Promise<number> {
 		return await this.callModel
-			.find({ from, organization, status })
+			.find({ organization, status })
 			.countDocuments();
 	}
 }

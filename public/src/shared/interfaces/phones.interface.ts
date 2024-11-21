@@ -48,6 +48,7 @@ export interface IPhoneItemTwilio {
 
 export interface IPhonesListResponse extends IResponseBase {
   results: IPhoneItem[]
+  count: number;
 }
 
 export interface IPhonesListTwilioResponse extends IResponseBase {

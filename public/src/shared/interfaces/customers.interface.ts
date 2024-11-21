@@ -83,6 +83,7 @@ export interface ICustomerItem {
 
 export interface ICustomerListResponse extends IResponseBase {
   results: ICustomerItem[];
+  count: number;
 }
 
 export interface ICustomerSingleResponse extends IResponseBase {

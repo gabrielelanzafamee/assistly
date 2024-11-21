@@ -33,6 +33,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/platform-socket.io": "^10.4.5",
     "@nestjs/platform-ws": "^10.4.5",
+    "@nestjs/schedule": "^4.1.1",
     "@nestjs/swagger": "^7.4.2",
     "@nestjs/websockets": "^10.4.4",
     "axios": "^1.7.7",

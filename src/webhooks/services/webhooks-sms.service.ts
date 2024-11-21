@@ -3,23 +3,40 @@ import { AssistantType } from 'src/core/enums/assistant.enum';
 import { ConversationType } from 'src/core/enums/conversation.enum';
 import { ITwilioSmsCallback } from 'src/core/interfaces/twilio.interface';
 import { WebhooksCommonService } from './webhooks-common.service';
+import { BlacklistService } from 'src/core/services/blacklist.service';
 
 @Injectable()
 export class WebhooksSmsService {
 	constructor(
-		private readonly webhooksCommonService: WebhooksCommonService
+		private readonly webhooksCommonService: WebhooksCommonService,
+		private readonly blacklistService: BlacklistService
 	) {}
 
 	async callbackSms(params: ITwilioSmsCallback, phoneId: string) {
+		const from = params.From;
 		const messageSid = params.MessageSid;
 		const smsStatus = params.SmsStatus;
-		const from = params.From;
 		const body = params.Body;
 
 		const { assistant, phone } = await this.webhooksCommonService.getAssistantAndPhone(
 			phoneId,
 			AssistantType.SMS,
 		);
+
+		// Check if the number is blacklisted
+		if (await this.blacklistService.isBlacklisted(phone.organization._id.toString(), from)) {
+			console.warn(`Blocked message from blacklisted number: ${from}`);
+			return false;
+		}
+
+		// Check rate limit
+		if (!await this.blacklistService.checkRateLimit(phone.organization._id.toString(), from)) {
+			console.warn(`Rate limit exceeded for number: ${from}`);
+
+			// Optionally, add to blacklist after repeated violations
+			await this.blacklistService.addToBlacklist(phone.organization._id.toString(), from, 'Rate limit exceeded');
+			return false;
+		}
 
 		const conversation =
 			await this.webhooksCommonService.conversationsService.getConversationOrCreate({
